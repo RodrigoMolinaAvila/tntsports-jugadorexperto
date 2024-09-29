@@ -21,7 +21,7 @@ driver_paths = {
 }
 
 # Define el número de iteraciones
-num_iteraciones = 100
+num_iteraciones = 1000
 
 # Variables para contar los clics exitosos
 clicks = {
@@ -43,13 +43,27 @@ url = "https://viz.flowics.com/public/c5227423dba55186a0b6764930612369/62290fd80
 # Función para actualizar el gráfico
 def update(frame):
     plt.clf()
-    plt.plot(data['edge'], label='Edge')
-    plt.plot(data['chrome'], label='Chrome')
-    plt.plot(data['firefox'], label='Firefox')
-    plt.legend(loc='upper left')
-    plt.xlabel('Iteraciones')
+    browsers = ['Edge', 'Chrome', 'Firefox']
+    clicks_totals = [clicks['edge'], clicks['chrome'], clicks['firefox']]
+    
+    # Obtener la paleta de colores 'inferno'
+    cmap = plt.get_cmap('inferno')
+    colors = [cmap(i / len(browsers)) for i in range(len(browsers))]
+    
+    # Crear histograma
+    plt.bar(browsers, clicks_totals, color=colors)
+    
+    # Agregar etiquetas de totales en cada barra
+    for i, total in enumerate(clicks_totals):
+        plt.text(i, total + 0.5, str(total), ha='center', va='bottom')
+    
+    # Mostrar el total de clics exitosos
+    total_clicks = sum(clicks_totals)
+    plt.text(1.5, max(clicks_totals) + 2, f'Total Clics Exitosos: {total_clicks}', ha='center', va='bottom', fontsize=12, color='black')
+    
+    plt.xlabel('Navegadores')
     plt.ylabel('Clics Exitosos')
-    plt.title('Evolución de Clics Exitosos por Navegador')
+    plt.title('Histograma de Clics Exitosos por Navegador')
 
 # Función para ejecutar el código de un navegador
 def run_browser(browser):
@@ -79,7 +93,9 @@ def run_browser(browser):
         try:
             driver.get(url)
             wait = WebDriverWait(driver, 2)
-            elemento = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#quick-poll-n26 > div.anwsers.oZ8O24vdejA4vhbOK7R-6w\\=\\= > div:nth-child(20)')))
+            
+            # Hacer clic en el elemento deseado
+            elemento = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#quick-poll-n26 > div.anwsers.oZ8O24vdejA4vhbOK7R-6w\\=\\= > div:nth-child(1)')))
             elemento.click()
             clicks[browser] += 1
             data[browser].append(clicks[browser])
@@ -89,7 +105,7 @@ def run_browser(browser):
             print(f"Error en {browser.capitalize()}: {e}")
         finally:
             driver.quit()
-        time.sleep(0.5)
+        time.sleep(2)
 
 # Crear hilos para cada navegador
 threads = {
