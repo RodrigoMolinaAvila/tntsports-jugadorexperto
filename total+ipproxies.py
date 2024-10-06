@@ -37,8 +37,8 @@ data = {
     'firefox': []
 }
 
-# URL de la página web
-url = "https://viz.flowics.com/public/c5227423dba55186a0b6764930612369/62290fd8069695d8f502cc90/live?fluid=false#embed&uuid=HUNMUXOWRuOseP7dWxe8Ww%3D%3D%7C1714500347873%7Cv1"
+# URL de la página web de TNT Sports para realizar la votación
+url = "https://tntsports.cl/jugador-experto-easy"
 
 # Función para actualizar el gráfico
 def update(frame):
@@ -89,13 +89,14 @@ def run_browser(browser):
         service = service_class[browser](executable_path=driver_paths[browser])
         options = options_class[browser]()
         options.add_argument(private_mode[browser])
+        options.add_argument("--headless")  # Ejecutar en modo sin cabeza (headless)
         driver = webdriver.__dict__[browser.capitalize()](service=service, options=options)
 
         try:
             driver.get(url)
-            wait = WebDriverWait(driver, 2)
+            wait = WebDriverWait(driver, 10)
             
-            # Hacer clic en el elemento deseado
+            # Hacer clic en el elemento de la votación en la página de TNT Sports
             elemento = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#quick-poll-n26 > div.anwsers.oZ8O24vdejA4vhbOK7R-6w\\=\\= > div:nth-child(1)')))
             elemento.click()
             clicks[browser] += 1
